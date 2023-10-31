@@ -1,0 +1,14 @@
+/*----------------------ELENCO PRODOTTI----------------------*/
+
+.layoutRooms
+{
+  width: 1366px;
+  height: 768px;
+
+  display: grid;
+  position: relative;
+  align-self: center;
+  grid-template-rows: repeat(auto-fit, 1fr);
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}

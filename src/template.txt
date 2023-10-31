@@ -1,0 +1,21 @@
+import React from "react";
+import 'bootstrap/dist/css/bootstrap.css';//importare bootstrap
+
+class NOMECLASSE extends React.Component
+{
+    constructor(props)
+    {
+        super(props);
+       
+    }
+
+    render()
+    {
+        return(
+            <div>
+                
+            </div>
+        )
+    }
+}
+export default NOMECLASSE;
