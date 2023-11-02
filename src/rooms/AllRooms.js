@@ -13,9 +13,9 @@ class AllRooms extends React.Component
     render()
     {
         return(
-                <section className="layoutRooms">
+                <div className="layoutRooms">
                     {this.props.rooms.map(room => <Room room={room} key={room.id}/>)}                    
-                </section>
+                </div>
         )
     }
 }

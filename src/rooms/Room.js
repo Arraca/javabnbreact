@@ -12,7 +12,7 @@ class Room extends React.Component
     render()
     {
         return(
-            <div className="card" style={{width: "18rem", height:"28rem"}}>
+            <div className="card" style={{width: "18rem", height:"28rem", textAlign:"center"}}>
                 <img src={this.props.room.img_url} className="card-img-top" style={{height:200}}/>
                 <div className="card-body">
                     <h5 className="card-title">{this.props.room.name}</h5>

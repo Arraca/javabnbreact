@@ -1,12 +1,12 @@
 import React from "react";
 import 'bootstrap/dist/css/bootstrap.css';//importare bootstrap
-
+import $ from 'jquery';
 class Login extends React.Component
 {
     constructor(props)
     {
         super(props);
-       this.state = {showRegister : false, tempCredentialsLogin : {}, tempCredentialsRegister : {}}
+       this.state = {showRegister : false, tempCredentialsLogin : {}, tempCredentialsRegister : {}, showLoginError:false, emailError:false}
        
     }
     
@@ -29,7 +29,7 @@ class Login extends React.Component
         let tempCredentials = this.state.tempCredentialsLogin;
         tempCredentials[e.target.name] = e.target.value;
         console.log(tempCredentials);
-        this.setState({tempCredentialsLogin: tempCredentials});
+        this.setState({tempCredentialsLogin: tempCredentials, showLoginError:false});
     }
 
     handleChangeRegister = (e) =>
@@ -38,18 +38,57 @@ class Login extends React.Component
         tempCredentials[e.target.name] = e.target.value;
         console.log(tempCredentials);
 
-        this.setState({tempCredentialsRegister: tempCredentials});
+        this.setState({tempCredentialsRegister: tempCredentials, emailError : false});
     }
 
     handleLogin = (e) =>
     {
         e.preventDefault();
-        console.log(this.state.tempCredentialsLogin)
+        var settings = {
+            "url": "http://localhost:8080/authenticate",
+            "method": "POST",
+            "timeout": 0,
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "data": JSON.stringify(this.state.tempCredentialsLogin),
+          };
+          
+          $.ajax(settings).done((response) => {
+
+            localStorage.setItem("token",response.token);
+            localStorage.setItem("username",this.state.tempCredentialsLogin.username);
+            this.props.Login(this.state.tempCredentialsLogin.username);
+            
+          }).fail(()=>
+          {this.setState({showLoginError:true});
+          $.ajaxSetup
+          ({
+            headers:{"Authorization":""}
+          }); });
+        
     }
+
+     ValidateEmail=(email)=>
+    {
+        var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        if(email.match(mailformat))
+        {
+            this.setState({emailError:false});
+        }
+        else
+        {
+            this.setState({emailError:true});
+        }
+    }
+
 
     handleRegister = (e) =>
     {
         e.preventDefault();
+        this.ValidateEmail(e.target.username.value);
+        if(this.state.emailError)
+            return;
         console.log(this.state.tempCredentialsRegister)
     }
 
@@ -62,6 +101,7 @@ class Login extends React.Component
         if(!this.state.showRegister)
         return(
             <div className="container">
+                <h2 style={{textAlign:"center"}}>Sign In</h2>
                 <form id="formlogin" onSubmit={this.handleLogin}>
                     <div class="mb-3">
                         <label for="exampleInputEmail" class="form-label">Email address</label>
@@ -72,6 +112,15 @@ class Login extends React.Component
                         <input name="password" type="password" class="form-control" id="exampleInputPassword1" required onChange={this.handleChangeLogin}/>
                     </div>
                     <br/>
+                    {
+                    this.state.showLoginError? 
+                    <div class="alert alert-danger" role="alert">
+                    Errore nel login: Account non ancora registrato o password errata.
+                    </div>
+                    :
+                    ""
+                    }
+                    <br/>
                     <button className="btn btn-light" onClick={this.handleShowRegister}>Need a new account?</button>
                     <br/><br/>
                     <button type="submit" class="btn btn-success">Sign In</button>
@@ -81,6 +130,7 @@ class Login extends React.Component
 
         return(
             <div className="container">
+                <h2 style={{textAlign:"center"}}>Sign Up</h2>
                 <form id="formregister" onSubmit={this.handleRegister}>
                     <div class="mb-3">
                         <label for="exampleInputEmail" class="form-label">Email address</label>
@@ -102,6 +152,16 @@ class Login extends React.Component
                         <label for="dobInput" class="form-label">Date of birth</label>
                         <input name="dob" type="date" class="form-control" id="dobInput" required onChange={this.handleChangeRegister}/>
                     </div>
+                    <br/>
+                    {
+                        this.state.emailError?
+                        <div class="alert alert-danger" role="alert">
+                        Errore: Email non è nel formato corretto (example@domain.ccc)!
+                        </div>
+                        :
+                       ""        
+                    }
+
                     <br/>
                     <button className="btn btn-light" onClick={this.handleShowLogin}>Already have an account?</button>
                     <br/><br/>

@@ -15,13 +15,13 @@ code {
 
 /*---------------------HOMEPAGE-----------------------------*/
 .layout {
-  width: 1366px;
-  height: 768px;
+  /* width: 1366px;
+  height: 768px; */
 
   display: grid;
   grid:
     "header" auto
-    "main" 1fr
+    "main" auto
     "footer" auto
     / 1fr;
   gap: 8px;
@@ -39,9 +39,9 @@ code {
 
 .layoutRooms
 {
-  width: 1366px;
-  height: 768px;
-
+  /* width: auto;
+  height: auto;
+ */
   display: grid;
   
   /* padding: 5%; */

@@ -24,6 +24,11 @@ class Navbar extends React.Component
         this.props.ShowLoginForm();
     }
 
+    notifyLogout= ()=>
+    {
+        this.props.Logout();
+    }
+
     render()
     {
         return(
@@ -38,9 +43,29 @@ class Navbar extends React.Component
                             <li class="nav-item">
                             <button class="nav-link" onClick={this.notifyShowRooms}>Camere</button>
                             </li>
+                            {
+                                this.props.loginDone===false?
                             <li class="nav-item">
                             <button class="nav-link" onClick={this.notifyShowLoginForm}>Login</button>
                             </li>
+                            :
+                            <li class="nav-item">
+                            <button className="nav-link btn btn-danger" onClick={this.notifyLogout}>Logout</button>
+                            </li>
+                            }
+                            
+                            
+                            {
+                            this.props.loginDone===true?
+                            <li class="nav-item">
+                            <button class="nav-link" onClick={this.notifyShowLoginForm}>Soggiorni passati</button> 
+                            </li> 
+                            :
+                            ""
+                            }
+                            
+                            
+
 
                         </ul>
                         <form class="d-flex" role="search">
