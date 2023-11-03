@@ -4,6 +4,10 @@ import Navbar from "./navbar/Navbar";
 import AllRooms from "./rooms/AllRooms";
 import $ from "jquery";
 import Login from "./login/Login";
+import Booking from "./booking/Booking";
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import FormRoom from "./formroom/FormRoom";
+
 class App extends React.Component
 {
   componentDidMount()
@@ -32,30 +36,137 @@ class App extends React.Component
     constructor(props)
     {
         super(props);
-       this.state={loaded : false,showRooms:false ,loginDone:false};
+       this.state=
+       {
+        loaded : false,
+        showRooms:false,
+        loginDone:false,
+        showBookings : false,
+        adminView : false,
+        showEmployeeBookings : false,
+        showRoomForm : false
+      };
     }
 
     ShowRooms = () =>
     {
-      this.setState({showRooms:true, showLoginForm:false})
+      this.setState({showRooms:true, showLoginForm:false , showBookings : false, showRoomForm:false})
+    }
+
+    ShowRoomForm = (roomId) =>
+    {
+      if(!roomId)
+      {
+        this.setState({showRoomForm:true, updatingRoom : false,showRooms:false, showLoginForm:false , showBookings : false})
+      }
+      else
+      {
+        this.setState({showRoomForm:true, updatingRoom : true, roomId : roomId,showRooms:false, showLoginForm:false , showBookings : false})
+      }
+    }
+
+    SaveRoom = (features) =>
+    {
+      var settings = {
+        "url": "/rooms",
+        "method": "POST",
+        "timeout": 0,
+        "headers": {
+          "Authorization": "Bearer "+ localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        },
+        "data": JSON.stringify(features),
+      };
+      
+      $.ajax(settings).done((response) => {
+        let rooms = this.state.allRooms;
+        rooms.push(response);
+        this.setState({allRooms : rooms, showRooms:true , showLoginForm:false , showBookings : false, showRoomForm:false});
+      }).fail(()=>alert("Errore"));
+    }
+
+    UpdateRoom = (roomid, features) =>
+    {
+      var settings = {
+        "url": "/rooms/"+roomid,
+        "method": "PUT",
+        "timeout": 0,
+        "headers": {
+          "Authorization": "Bearer "+ localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        },
+        "data": JSON.stringify(features),
+      };
+      
+      $.ajax(settings).done((response) => {
+        let rooms = this.state.allRooms;
+        rooms[roomid-1] = response;
+        this.setState({allRooms : rooms, showRooms:true , showLoginForm:false , showBookings : false, showRoomForm:false});
+
+      }).fail(()=>alert("Errore"));
+    }
+
+    DeleteRoom = (room) =>
+    {
+      var settings = {
+        "url": "/rooms/"+room.id,
+        "method": "DELETE",
+        "timeout": 0,
+        "headers": {
+          "Authorization": "Bearer "+ localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      };
+      
+      $.ajax(settings).done((response) => {
+        // console.log(response);
+        let rooms = this.state.allRooms;
+        let index = rooms.indexOf(room);
+        rooms.splice(index,1);
+        this.setState({allRooms : rooms, showRooms:true , showLoginForm:false , showBookings : false, showRoomForm:false});
+
+      });
     }
 
     ShowHomepage = () =>
     {
-      this.setState({showRooms:false , showLoginForm:false})
+      this.setState({showRooms:false , showLoginForm:false , showBookings : false, showRoomForm:false})
     }
 
     ShowLoginForm = () =>
     {
-      this.setState({showLoginForm : true, showRooms:false })
+      this.setState({showLoginForm : true, showRooms:false , showBookings : false, showRoomForm:false})
+    }
+
+    ShowBookings= () =>
+    {
+      this.setState({showLoginForm : false, showRooms:false, showBookings : true, showRoomForm:false})
+    }
+
+    EmployeeBookings = () =>
+    {
+      var settings = {
+        "url": "/roombookings",
+        "method": "GET",
+        "timeout": 0,
+        "headers": {
+          "Authorization": "Bearer "+ localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      };
+      
+      $.ajax(settings).done((response) => {
+        this.setState({allBookings : response, showEmployeeBookings : true})
+        console.log(this.state.allBookings)
+      });
     }
 
     Logout = () =>
     {
       localStorage.setItem("token","");
       localStorage.setItem("username","");
-      this.setState({customer:undefined, loginDone : false});
-
+      $.ajaxSetup({headers:{"Authorization":""}}); 
+      this.setState({customer:undefined, employee:undefined, loginDone : false, showBookings : false, adminView : false, showEmployeeBookings : false, showRooms:false});
     }
 
     Login = (username) =>
@@ -70,34 +181,123 @@ class App extends React.Component
           "Content-Type": "application/json"
         }
       };
+
+      var settingsEmployee = {
+        "url": "/employees/"+username+"/username",
+        "method": "GET",
+        "timeout": 0,
+        "headers": {
+          "Authorization": "Bearer "+ localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      };
+
       
       $.ajax(settings).done((response) => {
-        this.setState({customer : response, loginDone : true,showRooms:false , showLoginForm:false});
-        // console.log(response);
-      }).fail(()=> console.log("Errore!"));
+        this.setState({customer : response, loginDone : true,showRooms:false , showLoginForm:false, adminView : false});
+      })
+      .fail( 
+        $.ajax(settingsEmployee).done((response) => {
+        this.setState({employee : response, loginDone : true,showRooms:false , showLoginForm:false, adminView : true});
+      }))
+      .fail(()=> console.log("Errore!"));
 
     }
-
-    Register = () =>
+    Register = (credentials) =>
     {
+      console.log(credentials);
+      var settings = {
+        "url": "/customers",
+        "method": "POST",
+        "timeout": 0,
+        "headers": {
+          "Authorization": "Bearer "+ localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        },
+        "data": JSON.stringify(credentials),
+      };
+            
+      $.ajax(settings).done((response) => {
+        this.setState({customer : response, loginDone : true,showRooms:false , showLoginForm:false});
+      }).fail(()=> console.log("Errore!"));
+
 
     }
  
     render()
     {
       console.log(this.state)
-
+      //------------------------------------------------------------NON HA FATTO IL COMPONENT DID MOUNT---------------------------------------------------------------------------
       if(!this.state.loaded)
       return(
           <div>
           </div>
       )
+      //---------------------------------------------------------------------------VISTA PRENOTAZIONI IMPIEGATO--------------------------------------------------------------------
+      if(this.state.showEmployeeBookings && this.state.loginDone)
+      return(
+          <section className="layout">
+            <div className="header">
+              <Navbar ShowRooms={this.ShowRooms} ShowHomepage={this.ShowHomepage} ShowLoginForm = {this.ShowLoginForm} loginDone = {this.state.loginDone} Logout={this.Logout} ShowBookings={this.ShowBookings} adminView={this.state.adminView} EmployeeBookings = {this.EmployeeBookings}/>
+            </div>
+            <div className="main">
+              <table className="table table-dark table-striped">
+              <thead>                
+                <tr>
+                  <th scope="col">Room</th>
+                  <th scope="col">Check-in</th>
+                  <th scope="col">Check-out</th>
+                  <th scope="col">Customer</th>
+                  <th scope="col">Total price</th>
+                </tr>
+              </thead>
+              <tbody>
+                  {this.state.allBookings.map(booking => <Booking booking={booking} showEmployeeBookings={this.state.showEmployeeBookings}/>)}
+              </tbody>
+            </table>
+            </div>
+            <div className="footer">
+              TODO contatti e info della 
+            </div>
+        </section>
 
+        )
+
+      //---------------------------------------------------------------------VISTA PRENOTAZIONI CLIENTE--------------------------------------------------------------------------
+      if(this.state.showBookings && this.state.loginDone)
+      return(
+          <section className="layout">
+            <div className="header">
+              <Navbar ShowRooms={this.ShowRooms} ShowHomepage={this.ShowHomepage} ShowLoginForm = {this.ShowLoginForm} loginDone = {this.state.loginDone} Logout={this.Logout} ShowBookings={this.ShowBookings} adminView={this.state.adminView} EmployeeBookings = {this.EmployeeBookings}/>
+            </div>
+            <div className="main">
+              <table className="table table-dark table-striped">
+              <thead>                
+                <tr>
+                  <th scope="col">Room</th>
+                  <th scope="col">Check-in</th>
+                  <th scope="col">Check-out</th>
+                  <th scope="col">Notes</th>
+                  <th scope="col">Total price</th>
+                </tr>
+              </thead>
+              <tbody>
+                  {this.state.customer.bookings.map(booking => <Booking booking={booking}/>)}
+              </tbody>
+            </table>
+            </div>
+            <div className="footer">
+              TODO contatti e info della 
+            </div>
+        </section>
+
+        )
+      //--------------------------------------------------------MOSTRA LA FORM DI LOGIN--------------------------------------------------------------------------------------
       if(this.state.showLoginForm)
       return(
         <section className="layout">
         <div className="header">
-          <Navbar ShowRooms={this.ShowRooms} ShowHomepage={this.ShowHomepage} ShowLoginForm = {this.ShowLoginForm} loginDone = {this.state.loginDone} Logout={this.Logout}/>
+          <Navbar ShowRooms={this.ShowRooms} ShowHomepage={this.ShowHomepage} ShowLoginForm = {this.ShowLoginForm} loginDone = {this.state.loginDone} Logout={this.Logout} ShowBookings={this.ShowBookings} adminView={this.state.adminView} EmployeeBookings = {this.EmployeeBookings}/>
         </div>
         <div className="main">
           <Login Login={this.Login} Register = {this.Register}/>
@@ -108,12 +308,42 @@ class App extends React.Component
       </section>
 
         )
-
-      if(!this.state.showRooms)
+        //---------------------------------------------------------MOSTRA FORM CAMERA -------------------------------------------------------------------------------------
+        if(this.state.showRoomForm)
         return(
           <section className="layout">
           <div className="header">
-            <Navbar ShowRooms={this.ShowRooms} ShowHomepage={this.ShowHomepage} ShowLoginForm = {this.ShowLoginForm} loginDone = {this.state.loginDone} Logout={this.Logout}/>
+            <Navbar ShowRooms={this.ShowRooms} ShowHomepage={this.ShowHomepage} ShowLoginForm = {this.ShowLoginForm} loginDone = {this.state.loginDone} Logout={this.Logout} ShowBookings={this.ShowBookings} adminView={this.state.adminView} EmployeeBookings = {this.EmployeeBookings}/>
+          </div>
+          <div className="main">
+            <FormRoom updatingRoom={this.state.updatingRoom} SaveRoom={this.SaveRoom} roomId = {this.state.roomId} UpdateRoom={this.UpdateRoom}/>
+          </div>
+          <div className="footer">
+            TODO contatti e info della 
+          </div>
+        </section>
+          )
+        //----------------------------------------------------------MOSTRA LISTA CAMERE---------------------------------------------------------------------------------------
+        if(this.state.showRooms)
+        return(
+                <section className="layout">
+                  <div className="header">
+                    <Navbar ShowRooms={this.ShowRooms} ShowHomepage={this.ShowHomepage} ShowLoginForm = {this.ShowLoginForm} loginDone = {this.state.loginDone} Logout={this.Logout} ShowBookings={this.ShowBookings} adminView={this.state.adminView} EmployeeBookings = {this.EmployeeBookings}/>
+                  </div>
+                  <div className="main">
+                    <AllRooms rooms={this.state.allRooms} adminView={this.state.adminView} ShowRoomForm={this.ShowRoomForm} DeleteRoom={this.DeleteRoom}/>
+                  </div>
+                  <div className="footer">
+                    TODO contatti e info della 
+                  </div>
+                </section>
+        )
+
+        //--------------------------------------------------------MOSTRA HOMEPAGE-------------------------------------------------------------------------------------------
+        return(
+          <section className="layout">
+          <div className="header">
+            <Navbar ShowRooms={this.ShowRooms} ShowHomepage={this.ShowHomepage} ShowLoginForm = {this.ShowLoginForm} loginDone = {this.state.loginDone} Logout={this.Logout} ShowBookings={this.ShowBookings} adminView={this.state.adminView} EmployeeBookings = {this.EmployeeBookings}/>
           </div>
           <div className="main">
             LA NOSTRA HOMPAGE
@@ -124,24 +354,7 @@ class App extends React.Component
         </section>
 
           )
-      
-        return(
-                <section className="layout">
-                  <div className="header">
-                    <Navbar ShowRooms={this.ShowRooms} ShowHomepage={this.ShowHomepage} ShowLoginForm = {this.ShowLoginForm} loginDone = {this.state.loginDone} Logout={this.Logout}/>
-                  </div>
-                  <div className="title">
-                    <h2>Our Rooms</h2>
 
-                  </div>
-                  <div className="main">
-                    <AllRooms rooms={this.state.allRooms}/>
-                  </div>
-                  <div className="footer">
-                    TODO contatti e info della 
-                  </div>
-                </section>
-        )
     }
 }
 export default App;

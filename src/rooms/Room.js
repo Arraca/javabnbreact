@@ -9,6 +9,16 @@ class Room extends React.Component
        
     }
 
+    notifyNotifyShowRoomForm = () =>
+    {
+        this.props.notifyShowRoomForm(this.props.room.id);
+    }
+
+    notifyNotifyDeleteRoom = () =>
+    {
+        this.props.notifyDeleteRoom(this.props.room);
+    }
+
     render()
     {
         return(
@@ -22,7 +32,17 @@ class Room extends React.Component
                         <span>Notes: {this.props.room.notes}</span>
 
                     </p>
-                    <a href="#" className="btn btn-primary">Dettagli</a>
+                    <a href="#" className="btn btn-light">Dettagli <i class="bi bi-info-circle"></i></a>
+                    <br/>
+                    {
+                        this.props.adminView?
+                        <div>
+                        <button className="btn btn-warning" onClick={this.notifyNotifyShowRoomForm}>Modifica <i class="bi bi-pencil"></i></button>                        
+                        <button className="btn btn-danger" onClick={this.notifyNotifyDeleteRoom}>Elimina <i class="bi bi-trash"></i></button>
+                        </div>
+                        :
+                        ""
+                    }
                 </div>
             </div>
         )

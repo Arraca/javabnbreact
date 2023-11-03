@@ -24,6 +24,16 @@ class Navbar extends React.Component
         this.props.ShowLoginForm();
     }
 
+    notifyEmployeeBookings = () =>
+    {
+        this.props.EmployeeBookings();
+    }
+
+    notifyShowBookings = () =>
+    {
+        this.props.ShowBookings();
+    }
+
     notifyLogout= ()=>
     {
         this.props.Logout();
@@ -41,7 +51,7 @@ class Navbar extends React.Component
                             <button class="nav-link active" aria-current="page" onClick={this.notifyShowHome}>Home</button>
                             </li>
                             <li class="nav-item">
-                            <button class="nav-link" onClick={this.notifyShowRooms}>Camere</button>
+                            <button class="nav-link" onClick={this.notifyShowRooms}>Rooms</button>
                             </li>
                             {
                                 this.props.loginDone===false?
@@ -56,12 +66,18 @@ class Navbar extends React.Component
                             
                             
                             {
-                            this.props.loginDone===true?
+                            (this.props.loginDone && !this.props.adminView)?
                             <li class="nav-item">
-                            <button class="nav-link" onClick={this.notifyShowLoginForm}>Soggiorni passati</button> 
+                            <button class="nav-link" onClick={this.notifyShowBookings}>I tuoi soggiorni</button> 
                             </li> 
                             :
-                            ""
+                        
+                            (this.props.loginDone && this.props.adminView)?
+                            <li class="nav-item">
+                            <button class="nav-link" onClick={this.notifyEmployeeBookings}>Lista di prenotazioni</button> 
+                            </li> 
+                            :
+                            ""    
                             }
                             
                             

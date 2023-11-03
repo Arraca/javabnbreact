@@ -6,7 +6,7 @@ class Login extends React.Component
     constructor(props)
     {
         super(props);
-       this.state = {showRegister : false, tempCredentialsLogin : {}, tempCredentialsRegister : {}, showLoginError:false, emailError:false}
+       this.state = {showRegister : false, tempCredentialsLogin : {}, tempCredentialsRegister : {}, showLoginError:false, emailError:false, showRegisterError:false}
        
     }
     
@@ -38,7 +38,7 @@ class Login extends React.Component
         tempCredentials[e.target.name] = e.target.value;
         console.log(tempCredentials);
 
-        this.setState({tempCredentialsRegister: tempCredentials, emailError : false});
+        this.setState({tempCredentialsRegister: tempCredentials, showRegisterError:false});
     }
 
     handleLogin = (e) =>
@@ -69,10 +69,10 @@ class Login extends React.Component
         
     }
 
-     ValidateEmail=(email)=>
+     ValidateEmail=(e)=>
     {
         var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-        if(email.match(mailformat))
+        if(e.target.value.match(mailformat))
         {
             this.setState({emailError:false});
         }
@@ -86,10 +86,37 @@ class Login extends React.Component
     handleRegister = (e) =>
     {
         e.preventDefault();
-        this.ValidateEmail(e.target.username.value);
         if(this.state.emailError)
-            return;
-        console.log(this.state.tempCredentialsRegister)
+            alert("L'email non è nel formato corretto! rispetta il formato indicato.");
+        else
+        {
+            this.setState({showRegisterError : false})
+            console.log(this.state.tempCredentialsRegister);
+            var settings = {
+                "url": "http://localhost:8080/register",
+                "method": "POST",
+                "timeout": 0,
+                "headers": {
+                  "Content-Type": "application/json"
+                },
+                "data": JSON.stringify(this.state.tempCredentialsRegister),
+              };
+              
+              $.ajax(settings).done((response) => {
+    
+                localStorage.setItem("token",response.token);
+                localStorage.setItem("username",this.state.tempCredentialsRegister.username);
+                this.props.Register(this.state.tempCredentialsRegister);
+                
+              }).fail(()=>
+              {this.setState({showRegisterError:true});
+              $.ajaxSetup
+              ({
+                headers:{"Authorization":""}
+              }); });
+    
+        }
+
     }
 
 
@@ -134,7 +161,7 @@ class Login extends React.Component
                 <form id="formregister" onSubmit={this.handleRegister}>
                     <div class="mb-3">
                         <label for="exampleInputEmail" class="form-label">Email address</label>
-                        <input name="username" type="email" class="form-control" id="exampleInputEmail" aria-describedby="emailHelp" required onChange={this.handleChangeRegister}/>
+                        <input name="username" type="email" class="form-control" id="exampleInputEmail" aria-describedby="emailHelp" required onChange={this.handleChangeRegister} onBlur={this.ValidateEmail}/>
                     </div>
                     <div class="mb-3">
                         <label for="exampleInputPassword1" class="form-label">Password</label>
@@ -161,6 +188,16 @@ class Login extends React.Component
                         :
                        ""        
                     }
+                    <br/>
+                    {
+                    this.state.showRegisterError? 
+                    <div class="alert alert-danger" role="alert">
+                    Errore durante la registrazione: email già registrata!
+                    </div>
+                    :
+                    ""
+                    }
+
 
                     <br/>
                     <button className="btn btn-light" onClick={this.handleShowLogin}>Already have an account?</button>
