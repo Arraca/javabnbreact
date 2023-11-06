@@ -9,6 +9,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import FormRoom from "./formroom/FormRoom";
 import RoomDetails from "./rooms/RoomDetails";
 import ReserveRoom from "./rooms/ReserveRoom";
+import Footer from "./footer/Footer";
 
 class App extends React.Component
 {
@@ -28,11 +29,23 @@ class App extends React.Component
         "Content-Type": "application/json"
       }
     };
+
+    var settingsBookings = {
+      "url": "/roombookings",
+      "method": "GET",
+      "timeout": 0,
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    }
     
     $.ajax(settings).done((response) =>
     {
-      this.setState({allRooms:response, loaded:true, showLoginForm:false});
-    });
+      this.setState({allRooms:response, showLoginForm:false});
+    }).done($.ajax(settingsBookings).done((response) => 
+    {
+      this.setState({allBookings : response, loaded:true})
+    }));
   }
 
     constructor(props)
@@ -72,15 +85,15 @@ class App extends React.Component
       this.setState({showRooms:true, showLoginForm:false , showBookings : false, showRoomForm:false, showRoomDetails : false, showReserveRoom : false, showEmployeeBookings : false})
     }
 
-    ShowRoomForm = (roomId) =>
+    ShowRoomForm = (roomToUpdate) =>
     {
-      if(!roomId)
+      if(!roomToUpdate)
       {
         this.setState({showRoomForm:true, updatingRoom : false,showRooms:false, showLoginForm:false , showBookings : false, showRoomDetails : false, showReserveRoom : false, showEmployeeBookings : false})
       }
       else
       {
-        this.setState({showRoomForm:true, updatingRoom : true, roomId : roomId,showRooms:false, showLoginForm:false , showBookings : false , showRoomDetails : false, showReserveRoom : false, showEmployeeBookings : false})
+        this.setState({showRoomForm:true, updatingRoom : true, roomToUpdate : roomToUpdate,showRooms:false, showLoginForm:false , showBookings : false , showRoomDetails : false, showReserveRoom : false, showEmployeeBookings : false})
       }
     }
 
@@ -94,7 +107,7 @@ class App extends React.Component
     {
       this.setState({showReserveRoom : true, roomToReserve: room,showRoomForm:false, updatingRoom : false,showRooms:false, showLoginForm:false , showBookings : false, showRoomDetails : false, showEmployeeBookings : false})
     }
-    //-----------------------------------------------------------------------SAVING AND UPDATING METHODS-----------------------------------------------------------
+    //-----------------------------------------------------------------------SAVING ROOM-----------------------------------------------------------
     SaveRoom = (features) =>
     {
       var settings = {
@@ -114,11 +127,11 @@ class App extends React.Component
         this.setState({allRooms : rooms, showRooms:true , showLoginForm:false , showBookings : false, showRoomForm:false});
       }).fail(()=>alert("Errore"));
     }
-
-    UpdateRoom = (roomid, features) =>
+    //--------------------------------------------------------------------UPDATING BOOKINGS-----------------------------------------------------------
+    UpdateRoom = (roomToUpdate, features) =>
     {
       var settings = {
-        "url": "/rooms/"+roomid,
+        "url": "/rooms/"+roomToUpdate.id,
         "method": "PUT",
         "timeout": 0,
         "headers": {
@@ -130,10 +143,31 @@ class App extends React.Component
       
       $.ajax(settings).done((response) => {
         let rooms = this.state.allRooms;
-        rooms[roomid-1] = response;
+        let index = rooms.indexOf(roomToUpdate);
+        rooms[index] = response;
         this.setState({allRooms : rooms, showRooms:true , showLoginForm:false , showBookings : false, showRoomForm:false});
 
       }).fail(()=>alert("Errore"));
+    }
+
+    ApproveOrRejectBooking = (boolean, booking) =>
+    {
+      var settings = {
+        "url": "/approve/"+boolean+"/roombookings/"+booking.id,
+        "method": "PUT",
+        "timeout": 0,
+        "headers": {
+          "Authorization": "Bearer "+ localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      };
+      
+      $.ajax(settings).done((response) => {
+        let newAllBookings = this.state.allBookings;
+        let index = newAllBookings.indexOf(booking);
+        newAllBookings[index] = response;
+        this.setState({allBookings : newAllBookings, showRooms:false , showLoginForm:false , showBookings : true, showRoomForm:false});
+      });
     }
     //----------------------------------------------------------------DELETE ROOM------------------------------------------------
     DeleteRoom = (room) =>
@@ -157,12 +191,12 @@ class App extends React.Component
 
       });
     }
-    //------------------------------------------------------------READ ALL BOOKINGS-------------------------------------------------
-    EmployeeBookings = () =>
+    //------------------------------------------------------------DELETE BOOKING CUSTOMER------------------------------------------
+    DeleteBooking = (booking) =>
     {
       var settings = {
-        "url": "/roombookings",
-        "method": "GET",
+        "url": "/roombookings/"+booking.id,
+        "method": "DELETE",
         "timeout": 0,
         "headers": {
           "Authorization": "Bearer "+ localStorage.getItem("token"),
@@ -171,9 +205,56 @@ class App extends React.Component
       };
       
       $.ajax(settings).done((response) => {
-        this.setState({allBookings : response, showEmployeeBookings : true})
-        console.log(this.state.allBookings)
+        if(this.state.customer)
+        {
+          //RIMUOVO DALL'ELENCO GLOBALE
+          let newAllBookings = this.state.allBookings;
+          let indexAllBookings = newAllBookings.indexOf(booking);
+          newAllBookings.splice(indexAllBookings,1);
+          //RIMUOVO DALL'ELENCO DI CUSTOMER
+          let newCustomer = this.state.customer;
+          let newBookings = newCustomer.bookings;
+          let index = newBookings.indexOf(booking);
+          newBookings.splice(index,1);
+          newCustomer.bookings = newBookings
+          //AGGIORNO LO STATO
+          this.setState({customer : newCustomer, allBookings : newAllBookings, showRooms:false , showLoginForm:false, showBookings : true, showRoomForm:false});
+  
+        }
+        else
+        {
+          //RIMUOVO DALL'ELENCO GLOBALE
+          let newAllBookings = this.state.allBookings;
+          let indexAllBookings = newAllBookings.indexOf(booking);
+          newAllBookings.splice(indexAllBookings,1);
+          this.setState({allBookings : newAllBookings, showRooms:false , showLoginForm:false, showBookings : true, showRoomForm:false});
+
+        }
+
       });
+    }
+
+    //------------------------------------------------------------READ ALL BOOKINGS-------------------------------------------------
+    EmployeeBookings = () =>
+    {
+      // var settings = {
+      //   "url": "/roombookings",
+      //   "method": "GET",
+      //   "timeout": 0,
+      //   "headers": {
+      //     "Authorization": "Bearer "+ localStorage.getItem("token"),
+      //     "Content-Type": "application/json"
+      //   }
+      // };
+      
+      // $.ajax(settings).done((response) => {
+      //   this.setState({allBookings : response, showEmployeeBookings : true})
+      //   console.log(this.state.allBookings)
+      // });
+
+      this.setState({showEmployeeBookings : true})
+
+
     }
 
     //-----------------------------------------------------------LOGIN, LOGOUT, & REGISTER--------------------------------------------
@@ -259,10 +340,16 @@ class App extends React.Component
         console.log(response);
         let reservingCustomer = this.state.customer;
         reservingCustomer.bookings.push(response);
-        this.setState({customer : reservingCustomer, showLoginForm : false, showRooms:false, showBookings : true, showRoomForm:false, showRoomDetails : false})
+        let newAllBookings = this.state.allBookings;
+        newAllBookings.push(response);
+        this.setState({customer : reservingCustomer, allBookings : newAllBookings, showLoginForm : false, showRooms:false, showBookings : true, showRoomForm:false, showRoomDetails : false})
       }).fail(()=> alert("Errore"));
     }
-    //------------------------------------------------------------------------ RENDER -----------------------------------------------------------------------
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------
+    //ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo RENDER oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------
+
     render()
     {
       console.log(this.state)
@@ -288,15 +375,16 @@ class App extends React.Component
                   <th scope="col">Check-out</th>
                   <th scope="col">Customer</th>
                   <th scope="col">Total price</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
-                  {this.state.allBookings.map(booking => <Booking booking={booking} showEmployeeBookings={this.state.showEmployeeBookings}/>)}
+                  {this.state.allBookings.map(booking => <Booking booking={booking} DeleteBooking={this.DeleteBooking} showEmployeeBookings={this.state.showEmployeeBookings} employee = {this.state.employee} ApproveOrRejectBooking = {this.ApproveOrRejectBooking}/>)}
               </tbody>
             </table>
             </div>
             <div className="footer">
-              TODO contatti e info della 
+              <Footer/> 
             </div>
         </section>
 
@@ -318,15 +406,17 @@ class App extends React.Component
                   <th scope="col">Check-out</th>
                   <th scope="col">Notes</th>
                   <th scope="col">Total price</th>
+                  <th scope="col">Status</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
-                  {this.state.customer.bookings.map(booking => <Booking booking={booking}/>)}
+                  {this.state.customer.bookings.map(booking => <Booking booking={booking} DeleteBooking={this.DeleteBooking} customer = {this.state.customer}/>)}
               </tbody>
             </table>
             </div>
             <div className="footer">
-              TODO contatti e info della 
+              <Footer/> 
             </div>
         </section>
 
@@ -342,7 +432,7 @@ class App extends React.Component
           <Login Login={this.Login} Register = {this.Register}/>
         </div>
         <div className="footer">
-          TODO contatti e info della 
+          <Footer/> 
         </div>
       </section>
 
@@ -355,10 +445,10 @@ class App extends React.Component
             <Navbar ShowRooms={this.ShowRooms} ShowHomepage={this.ShowHomepage} ShowLoginForm = {this.ShowLoginForm} loginDone = {this.state.loginDone} Logout={this.Logout} ShowBookings={this.ShowBookings} adminView={this.state.adminView} EmployeeBookings = {this.EmployeeBookings}/>
           </div>
           <div className="main">
-            <FormRoom updatingRoom={this.state.updatingRoom} SaveRoom={this.SaveRoom} roomId = {this.state.roomId} UpdateRoom={this.UpdateRoom} ShowRooms={this.ShowRooms}/>
+            <FormRoom updatingRoom={this.state.updatingRoom} SaveRoom={this.SaveRoom} roomToUpdate = {this.state.roomToUpdate} UpdateRoom={this.UpdateRoom} ShowRooms={this.ShowRooms}/>
           </div>
           <div className="footer">
-            TODO contatti e info della 
+            <Footer/> 
           </div>
         </section>
           )
@@ -373,7 +463,7 @@ class App extends React.Component
                     <AllRooms rooms={this.state.allRooms} adminView={this.state.adminView} ShowRoomForm={this.ShowRoomForm} DeleteRoom={this.DeleteRoom} ShowRoomDetails = {this.ShowRoomDetails}/>
                   </div>
                   <div className="footer">
-                    TODO contatti e info della 
+                    <Footer/> 
                   </div>
                 </section>
         )
@@ -389,7 +479,7 @@ class App extends React.Component
            <RoomDetails room = {this.state.roomDet} ShowRooms={this.ShowRooms} customer={this.state.customer} ShowReserveRoom={this.ShowReserveRoom}/>
           </div>
           <div className="footer">
-            TODO contatti e info della 
+            <Footer/> 
           </div>
         </section>
           )
@@ -402,10 +492,10 @@ class App extends React.Component
             <Navbar ShowRooms={this.ShowRooms} ShowHomepage={this.ShowHomepage} ShowLoginForm = {this.ShowLoginForm} loginDone = {this.state.loginDone} Logout={this.Logout} ShowBookings={this.ShowBookings} adminView={this.state.adminView} EmployeeBookings = {this.EmployeeBookings}/>
           </div>
           <div className="main">
-            <ReserveRoom ReserveRoom={this.ReserveRoom}/>
+            <ReserveRoom ReserveRoom={this.ReserveRoom} allBookings = {this.state.allBookings}/>
           </div>
           <div className="footer">
-            TODO contatti e info della 
+            <Footer/> 
           </div>
         </section>
           )
@@ -419,7 +509,7 @@ class App extends React.Component
             LA NOSTRA HOMPAGE
           </div>
           <div className="footer">
-            TODO contatti e info della 
+            <Footer/> 
           </div>
         </section>
 

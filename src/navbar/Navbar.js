@@ -43,9 +43,9 @@ class Navbar extends React.Component
     {
         return(
             <div>
-                <nav className="navbar bg-dark navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+                <nav className="navbar bg-dark navbar-expand-lg bg-body-tertiary" data-bs-theme="dark" style={{fontSize:20}}>
                     <div class="container-fluid">
-                        <a class="navbar-brand" href="#">JavaB&B</a>
+                        <a class="navbar-brand" href="#" onClick={this.notifyShowHome}><img src="/images/logo.png" style={{borderRadius:"50%", width:60}}></img></a>
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                             <li class="nav-item">
                             <button class="nav-link active" aria-current="page" onClick={this.notifyShowHome}>Home</button>
@@ -53,16 +53,6 @@ class Navbar extends React.Component
                             <li class="nav-item">
                             <button class="nav-link" onClick={this.notifyShowRooms}>Rooms</button>
                             </li>
-                            {
-                                this.props.loginDone===false?
-                            <li class="nav-item">
-                            <button class="nav-link" onClick={this.notifyShowLoginForm}>Login</button>
-                            </li>
-                            :
-                            <li class="nav-item">
-                            <button className="nav-link btn btn-danger" onClick={this.notifyLogout}>Logout</button>
-                            </li>
-                            }
                             
                             
                             {
@@ -84,10 +74,17 @@ class Navbar extends React.Component
 
 
                         </ul>
-                        <form class="d-flex" role="search">
-                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-                            <button class="btn btn-outline-success" type="submit">Search</button>
-                        </form>
+                        {
+                                this.props.loginDone===false?
+                                <div class="d-flex">
+                                <button class="btn btn-success" onClick={this.notifyShowLoginForm} style={{fontSize:20}}>Login <i class="bi bi-box-arrow-right"></i></button>
+                                </div>
+                                :
+                                <div class="d-flex">
+                                <button className="btn btn-danger" onClick={this.notifyLogout} style={{fontSize:20}}>Logout <i class="bi bi-box-arrow-left"></i></button>
+                                </div>
+                        }
+
                         </div>
                     
                     </nav>

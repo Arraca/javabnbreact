@@ -10,12 +10,12 @@ class AllRooms extends React.Component
        
     }
 
-    notifyShowRoomForm = (roomId) =>
+    notifyShowRoomForm = (roomToUpdate) =>
     {
-        if(isNaN(roomId))
+        if(roomToUpdate === undefined)
         this.props.ShowRoomForm();
         else
-        this.props.ShowRoomForm(roomId);
+        this.props.ShowRoomForm(roomToUpdate);
     }
 
     notifyDeleteRoom = (room) =>

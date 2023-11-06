@@ -11,7 +11,7 @@ class Room extends React.Component
 
     notifyNotifyShowRoomForm = () =>
     {
-        this.props.notifyShowRoomForm(this.props.room.id);
+        this.props.notifyShowRoomForm(this.props.room);
     }
 
     notifyNotifyDeleteRoom = () =>
