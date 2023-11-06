@@ -7,6 +7,8 @@ import Login from "./login/Login";
 import Booking from "./booking/Booking";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import FormRoom from "./formroom/FormRoom";
+import RoomDetails from "./rooms/RoomDetails";
+import ReserveRoom from "./rooms/ReserveRoom";
 
 class App extends React.Component
 {
@@ -44,27 +46,55 @@ class App extends React.Component
         showBookings : false,
         adminView : false,
         showEmployeeBookings : false,
-        showRoomForm : false
+        showRoomForm : false,
+        showRoomDetails : false,
+        showReserveRoom : false
       };
+    }
+    //---------------------------------------------------------SHOWING METHODS-------------------------------------------------------------------------------------
+    ShowHomepage = () =>
+    {
+      this.setState({showRooms:false , showLoginForm:false , showBookings : false, showRoomForm:false, showRoomDetails : false, showReserveRoom : false, showEmployeeBookings : false})
+    }
+
+    ShowLoginForm = () =>
+    {
+      this.setState({showLoginForm : true, showRooms:false , showBookings : false, showRoomForm:false, showRoomDetails : false, showReserveRoom : false, showEmployeeBookings : false})
+    }
+
+    ShowBookings= () =>
+    {
+      this.setState({showLoginForm : false, showRooms:false, showBookings : true, showRoomForm:false, showRoomDetails : false, showReserveRoom : false, showEmployeeBookings : false})
     }
 
     ShowRooms = () =>
     {
-      this.setState({showRooms:true, showLoginForm:false , showBookings : false, showRoomForm:false})
+      this.setState({showRooms:true, showLoginForm:false , showBookings : false, showRoomForm:false, showRoomDetails : false, showReserveRoom : false, showEmployeeBookings : false})
     }
 
     ShowRoomForm = (roomId) =>
     {
       if(!roomId)
       {
-        this.setState({showRoomForm:true, updatingRoom : false,showRooms:false, showLoginForm:false , showBookings : false})
+        this.setState({showRoomForm:true, updatingRoom : false,showRooms:false, showLoginForm:false , showBookings : false, showRoomDetails : false, showReserveRoom : false, showEmployeeBookings : false})
       }
       else
       {
-        this.setState({showRoomForm:true, updatingRoom : true, roomId : roomId,showRooms:false, showLoginForm:false , showBookings : false})
+        this.setState({showRoomForm:true, updatingRoom : true, roomId : roomId,showRooms:false, showLoginForm:false , showBookings : false , showRoomDetails : false, showReserveRoom : false, showEmployeeBookings : false})
       }
     }
 
+    ShowRoomDetails = (roomDet) =>
+    {
+      this.setState({showRoomDetails : true,showRoomForm:false, updatingRoom : false, roomDet : roomDet,showRooms:false, showLoginForm:false , showBookings : false, showReserveRoom : false, showEmployeeBookings : false})
+
+    }
+
+    ShowReserveRoom = (room) =>
+    {
+      this.setState({showReserveRoom : true, roomToReserve: room,showRoomForm:false, updatingRoom : false,showRooms:false, showLoginForm:false , showBookings : false, showRoomDetails : false, showEmployeeBookings : false})
+    }
+    //-----------------------------------------------------------------------SAVING AND UPDATING METHODS-----------------------------------------------------------
     SaveRoom = (features) =>
     {
       var settings = {
@@ -105,7 +135,7 @@ class App extends React.Component
 
       }).fail(()=>alert("Errore"));
     }
-
+    //----------------------------------------------------------------DELETE ROOM------------------------------------------------
     DeleteRoom = (room) =>
     {
       var settings = {
@@ -127,22 +157,7 @@ class App extends React.Component
 
       });
     }
-
-    ShowHomepage = () =>
-    {
-      this.setState({showRooms:false , showLoginForm:false , showBookings : false, showRoomForm:false})
-    }
-
-    ShowLoginForm = () =>
-    {
-      this.setState({showLoginForm : true, showRooms:false , showBookings : false, showRoomForm:false})
-    }
-
-    ShowBookings= () =>
-    {
-      this.setState({showLoginForm : false, showRooms:false, showBookings : true, showRoomForm:false})
-    }
-
+    //------------------------------------------------------------READ ALL BOOKINGS-------------------------------------------------
     EmployeeBookings = () =>
     {
       var settings = {
@@ -161,12 +176,13 @@ class App extends React.Component
       });
     }
 
+    //-----------------------------------------------------------LOGIN, LOGOUT, & REGISTER--------------------------------------------
     Logout = () =>
     {
       localStorage.setItem("token","");
       localStorage.setItem("username","");
       $.ajaxSetup({headers:{"Authorization":""}}); 
-      this.setState({customer:undefined, employee:undefined, loginDone : false, showBookings : false, adminView : false, showEmployeeBookings : false, showRooms:false});
+      this.setState({customer:undefined, employee:undefined, loginDone : false, showBookings : false, adminView : false, showEmployeeBookings : false, showRooms:false ,showReserveRoom : false});
     }
 
     Login = (username) =>
@@ -196,7 +212,7 @@ class App extends React.Component
       $.ajax(settings).done((response) => {
         this.setState({customer : response, loginDone : true,showRooms:false , showLoginForm:false, adminView : false});
       })
-      .fail( 
+      .fail(() =>
         $.ajax(settingsEmployee).done((response) => {
         this.setState({employee : response, loginDone : true,showRooms:false , showLoginForm:false, adminView : true});
       }))
@@ -223,7 +239,30 @@ class App extends React.Component
 
 
     }
- 
+
+    //------------------------------------------------------------RESERVE A ROOM--------------------------------------------------------------
+    ReserveRoom = (date) =>
+    {
+
+      var settings = {
+        "url": "/roombookings/"+this.state.roomToReserve.id+"/room/"+this.state.customer.id+"/customer",
+        "method": "POST",
+        "timeout": 0,
+        "headers": {
+          "Authorization": "Bearer "+ localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        },
+        "data": JSON.stringify(date),
+      };
+      
+      $.ajax(settings).done((response) => {
+        console.log(response);
+        let reservingCustomer = this.state.customer;
+        reservingCustomer.bookings.push(response);
+        this.setState({customer : reservingCustomer, showLoginForm : false, showRooms:false, showBookings : true, showRoomForm:false, showRoomDetails : false})
+      }).fail(()=> alert("Errore"));
+    }
+    //------------------------------------------------------------------------ RENDER -----------------------------------------------------------------------
     render()
     {
       console.log(this.state)
@@ -316,7 +355,7 @@ class App extends React.Component
             <Navbar ShowRooms={this.ShowRooms} ShowHomepage={this.ShowHomepage} ShowLoginForm = {this.ShowLoginForm} loginDone = {this.state.loginDone} Logout={this.Logout} ShowBookings={this.ShowBookings} adminView={this.state.adminView} EmployeeBookings = {this.EmployeeBookings}/>
           </div>
           <div className="main">
-            <FormRoom updatingRoom={this.state.updatingRoom} SaveRoom={this.SaveRoom} roomId = {this.state.roomId} UpdateRoom={this.UpdateRoom}/>
+            <FormRoom updatingRoom={this.state.updatingRoom} SaveRoom={this.SaveRoom} roomId = {this.state.roomId} UpdateRoom={this.UpdateRoom} ShowRooms={this.ShowRooms}/>
           </div>
           <div className="footer">
             TODO contatti e info della 
@@ -331,7 +370,7 @@ class App extends React.Component
                     <Navbar ShowRooms={this.ShowRooms} ShowHomepage={this.ShowHomepage} ShowLoginForm = {this.ShowLoginForm} loginDone = {this.state.loginDone} Logout={this.Logout} ShowBookings={this.ShowBookings} adminView={this.state.adminView} EmployeeBookings = {this.EmployeeBookings}/>
                   </div>
                   <div className="main">
-                    <AllRooms rooms={this.state.allRooms} adminView={this.state.adminView} ShowRoomForm={this.ShowRoomForm} DeleteRoom={this.DeleteRoom}/>
+                    <AllRooms rooms={this.state.allRooms} adminView={this.state.adminView} ShowRoomForm={this.ShowRoomForm} DeleteRoom={this.DeleteRoom} ShowRoomDetails = {this.ShowRoomDetails}/>
                   </div>
                   <div className="footer">
                     TODO contatti e info della 
@@ -339,6 +378,37 @@ class App extends React.Component
                 </section>
         )
 
+        //-------------------------------------------------------MOSTRA DETTAGLI CAMERA------------------------------------------------------------------------------------
+        if(this.state.showRoomDetails)
+        return(
+          <section className="layout">
+          <div className="header">
+            <Navbar ShowRooms={this.ShowRooms} ShowHomepage={this.ShowHomepage} ShowLoginForm = {this.ShowLoginForm} loginDone = {this.state.loginDone} Logout={this.Logout} ShowBookings={this.ShowBookings} adminView={this.state.adminView} EmployeeBookings = {this.EmployeeBookings}/>
+          </div>
+          <div className="main">
+           <RoomDetails room = {this.state.roomDet} ShowRooms={this.ShowRooms} customer={this.state.customer} ShowReserveRoom={this.ShowReserveRoom}/>
+          </div>
+          <div className="footer">
+            TODO contatti e info della 
+          </div>
+        </section>
+          )
+
+        //-------------------------------------------------------MOSTRA PRENOTA CAMERA-----------------------------------------------------------------------------
+        if(this.state.showReserveRoom)
+        return(
+          <section className="layout">
+          <div className="header">
+            <Navbar ShowRooms={this.ShowRooms} ShowHomepage={this.ShowHomepage} ShowLoginForm = {this.ShowLoginForm} loginDone = {this.state.loginDone} Logout={this.Logout} ShowBookings={this.ShowBookings} adminView={this.state.adminView} EmployeeBookings = {this.EmployeeBookings}/>
+          </div>
+          <div className="main">
+            <ReserveRoom ReserveRoom={this.ReserveRoom}/>
+          </div>
+          <div className="footer">
+            TODO contatti e info della 
+          </div>
+        </section>
+          )
         //--------------------------------------------------------MOSTRA HOMEPAGE-------------------------------------------------------------------------------------------
         return(
           <section className="layout">

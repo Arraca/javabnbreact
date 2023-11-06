@@ -49,3 +49,34 @@ code {
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
 }
+
+/*------------------------ROOM DETAILS------------------------*/
+.layoutDetails {
+  width: auto;
+  height: auto;
+
+  display: grid;
+  grid:
+    "sidebar body" 1fr
+    / auto 1fr;
+  gap: 8px;
+}
+
+.sidebarDetails { grid-area: sidebar; }
+.bodyDetails { grid-area: body; }
+
+.layoutDetailGrid {
+  width: auto;
+  height: auto;
+
+  display: grid;
+  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px;
+}
+
+/*--------------------------------------FORM ROOM------------------------------*/
+.formRoom 
+{
+  width: 60%;
+}

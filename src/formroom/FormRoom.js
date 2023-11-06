@@ -9,6 +9,11 @@ class FormRoom extends React.Component
         this.state={tempFeatures : {}}
     }
 
+    notifyShowRooms = () =>
+    {
+        this.props.ShowRooms();
+    }
+
     notifySaveRoom = (e) =>
     {
         e.preventDefault();
@@ -35,9 +40,13 @@ class FormRoom extends React.Component
 //-------------------------------------------NEW ROOM--------------------------------------------------
         if(!this.props.updatingRoom)
         return(
-            <div>
+            <div className="formRoom">
+                <div>
+                    <button className="btn btn-light"><i class="bi bi-arrow-left-circle" style={{fontSize:30}} onClick={this.notifyShowRooms}></i></button>
+                </div>
+
                 <h2 style={{textAlign:"center"}}>Insert new room</h2>
-                <form onSubmit={this.notifySaveRoom}>
+                <form  onSubmit={this.notifySaveRoom}>
                     <div class="mb-3">
                         <label for="name" class="form-label">Name</label>
                         <input name="name" type="text" class="form-control" id="name" aria-describedby="emailHelp" onChange={this.handleChange} required/>
@@ -66,9 +75,13 @@ class FormRoom extends React.Component
 //-----------------------------------------UPDATE-----------------------------------------------------
         else{
             return(
-                <div>
+                <div className="formRoom">
+                    <div>
+                        <button className="btn btn-light"><i class="bi bi-arrow-left-circle" style={{fontSize:30}} onClick={this.notifyShowRooms}></i></button>
+                    </div>
+
                     <h2 style={{textAlign:"center"}}>Update existing room</h2>
-                    <form onSubmit={this.notifyUpdateRoom}>
+                    <form  onSubmit={this.notifyUpdateRoom}>
                         <div class="mb-3">
                             <label for="name" class="form-label">Name</label>
                             <input name="name" type="text" class="form-control" id="name" aria-describedby="emailHelp" onChange={this.handleChange} required/>

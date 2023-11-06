@@ -23,6 +23,12 @@ class AllRooms extends React.Component
         this.props.DeleteRoom(room);
     }
 
+    notifyShowRoomDetails = (roomD) =>
+    {
+        this.props.ShowRoomDetails(roomD);
+
+    }
+
     render()
     {
         return(
@@ -30,7 +36,7 @@ class AllRooms extends React.Component
                     <h2 style={{textAlign:"center"}}>Our Rooms</h2>
                     <br/>
                     <div className=" layoutRooms " style={{textAlign:"center"}}>
-                    {this.props.rooms.map(room => <Room room={room} key={room.id} adminView={this.props.adminView} notifyShowRoomForm = {this.notifyShowRoomForm} notifyDeleteRoom = {this.notifyDeleteRoom}/>)}   
+                    {this.props.rooms.map(room => <Room room={room} key={room.id} adminView={this.props.adminView} notifyShowRoomForm = {this.notifyShowRoomForm} notifyDeleteRoom = {this.notifyDeleteRoom} notifyShowRoomDetails={this.notifyShowRoomDetails}/>)}   
                     </div>
                     <br/><br/>
                     {
