@@ -34,6 +34,10 @@ class Footer extends React.Component
 
                     </div>
                 </div>
+                <div className="text-center p-4">
+                            © 2021 Copyright: GELFsrl.com
+                </div>
+
             </div>
         )
     }

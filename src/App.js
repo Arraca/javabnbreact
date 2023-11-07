@@ -10,6 +10,8 @@ import FormRoom from "./formroom/FormRoom";
 import RoomDetails from "./rooms/RoomDetails";
 import ReserveRoom from "./rooms/ReserveRoom";
 import Footer from "./footer/Footer";
+import Homepage from "./homepage/Homepage";
+import HomeCarousel from "./homepage/HomeCarousel";
 
 class App extends React.Component
 {
@@ -504,9 +506,11 @@ class App extends React.Component
           <section className="layout">
           <div className="header">
             <Navbar ShowRooms={this.ShowRooms} ShowHomepage={this.ShowHomepage} ShowLoginForm = {this.ShowLoginForm} loginDone = {this.state.loginDone} Logout={this.Logout} ShowBookings={this.ShowBookings} adminView={this.state.adminView} EmployeeBookings = {this.EmployeeBookings}/>
+            <Homepage allRooms={this.state.allRooms}/>
           </div>
           <div className="main">
-            LA NOSTRA HOMPAGE
+            <HomeCarousel allRooms={this.state.allRooms} />
+
           </div>
           <div className="footer">
             <Footer/> 
