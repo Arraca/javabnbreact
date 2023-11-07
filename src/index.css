@@ -17,6 +17,7 @@ code {
 .layout {
   /* width: 1366px;
   height: 768px; */
+  background-color: #eeeeee;
 
   display: grid;
   grid:

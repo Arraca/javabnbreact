@@ -24,7 +24,7 @@ class App extends React.Component
 
 
     var settings = {
-      "url": "http://localhost:8080/rooms/nolist",
+      "url": "http://localhost:8080/rooms/full",
       "method": "GET",
       "timeout": 0,
       "headers": {
@@ -69,7 +69,7 @@ class App extends React.Component
     //---------------------------------------------------------SHOWING METHODS-------------------------------------------------------------------------------------
     ShowHomepage = () =>
     {
-      this.setState({showRooms:false , showLoginForm:false , showBookings : false, showRoomForm:false, showRoomDetails : false, showReserveRoom : false, showEmployeeBookings : false})
+      this.setState({showRooms:false , showLoginForm:false , showBookings : false, showRoomForm:false, showRoomDetails : false, showReserveRoom : false, showEmployeeBookings : false, visibleRooms : undefined})
     }
 
     ShowLoginForm = () =>
@@ -84,7 +84,7 @@ class App extends React.Component
 
     ShowRooms = () =>
     {
-      this.setState({showRooms:true, showLoginForm:false , showBookings : false, showRoomForm:false, showRoomDetails : false, showReserveRoom : false, showEmployeeBookings : false})
+      this.setState({showRooms:true, showLoginForm:false , showBookings : false, showRoomForm:false, showRoomDetails : false, showReserveRoom : false, showEmployeeBookings : false, visibleRooms : undefined})
     }
 
     ShowRoomForm = (roomToUpdate) =>
@@ -108,6 +108,11 @@ class App extends React.Component
     ShowReserveRoom = (room) =>
     {
       this.setState({showReserveRoom : true, roomToReserve: room,showRoomForm:false, updatingRoom : false,showRooms:false, showLoginForm:false , showBookings : false, showRoomDetails : false, showEmployeeBookings : false})
+    }
+    //-----------------------------------------------------------------------FILTER ROOMS----------------------------------------------------------
+    FilterRooms = (array) =>
+    {
+      this.setState({visibleRooms : array, showRooms:true, showLoginForm:false , showBookings : false, showRoomForm:false, showRoomDetails : false, showReserveRoom : false, showEmployeeBookings : false});
     }
     //-----------------------------------------------------------------------SAVING ROOM-----------------------------------------------------------
     SaveRoom = (features) =>
@@ -462,7 +467,7 @@ class App extends React.Component
                     <Navbar ShowRooms={this.ShowRooms} ShowHomepage={this.ShowHomepage} ShowLoginForm = {this.ShowLoginForm} loginDone = {this.state.loginDone} Logout={this.Logout} ShowBookings={this.ShowBookings} adminView={this.state.adminView} EmployeeBookings = {this.EmployeeBookings}/>
                   </div>
                   <div className="main">
-                    <AllRooms rooms={this.state.allRooms} adminView={this.state.adminView} ShowRoomForm={this.ShowRoomForm} DeleteRoom={this.DeleteRoom} ShowRoomDetails = {this.ShowRoomDetails}/>
+                    <AllRooms rooms={this.state.allRooms} filteredRooms = {this.state.visibleRooms} adminView={this.state.adminView} ShowRoomForm={this.ShowRoomForm} DeleteRoom={this.DeleteRoom} ShowRoomDetails = {this.ShowRoomDetails}/>
                   </div>
                   <div className="footer">
                     <Footer/> 
@@ -506,10 +511,19 @@ class App extends React.Component
           <section className="layout">
           <div className="header">
             <Navbar ShowRooms={this.ShowRooms} ShowHomepage={this.ShowHomepage} ShowLoginForm = {this.ShowLoginForm} loginDone = {this.state.loginDone} Logout={this.Logout} ShowBookings={this.ShowBookings} adminView={this.state.adminView} EmployeeBookings = {this.EmployeeBookings}/>
-            <Homepage allRooms={this.state.allRooms}/>
+            <Homepage allRooms={this.state.allRooms} allBookings = {this.state.allBookings} FilterRooms = {this.FilterRooms}/>
           </div>
-          <div className="main">
-            <HomeCarousel allRooms={this.state.allRooms} />
+          <div>
+            <div style={{textAlign:"center"}}>
+              <img src="/images/logo.png" style={{borderRadius:"50%", width:200}}/>
+            </div>
+            <br/>
+            <p className="container" style={{textAlign:"justify"}}>Cras tincidunt felis mauris. Morbi congue ullamcorper vulputate. Suspendisse id odio vel purus bibendum volutpat mollis non nulla. Fusce pulvinar elit velit, ac tempus quam convallis quis. In vel risus at libero rhoncus fringilla id non velit. Duis tempor ante ligula, varius facilisis tellus pretium eget. Mauris congue efficitur scelerisque. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Mauris non ipsum aliquam, semper est non, commodo velit. Phasellus ac lobortis sapien. Nullam egestas urna id faucibus semper.</p>
+            <div>
+              <HomeCarousel allRooms={this.state.allRooms} />
+            </div>
+            <p className="container" style={{textAlign:"justify"}}>Cras tincidunt felis mauris. Morbi congue ullamcorper vulputate. Suspendisse id odio vel purus bibendum volutpat mollis non nulla. Fusce pulvinar elit velit, ac tempus quam convallis quis. In vel risus at libero rhoncus fringilla id non velit. Duis tempor ante ligula, varius facilisis tellus pretium eget. Mauris congue efficitur scelerisque. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Mauris non ipsum aliquam, semper est non, commodo velit. Phasellus ac lobortis sapien. Nullam egestas urna id faucibus semper. Aliquam erat volutpat. In ut scelerisque augue, id pharetra sapien. Ut viverra, lacus ut pulvinar blandit, massa tellus interdum lectus, a porttitor lectus nibh sed augue. Maecenas sit amet neque ut ipsum lacinia euismod. Nullam a magna augue. Sed pulvinar ultricies metus, nec bibendum nunc facilisis sit amet. Maecenas dapibus ac dolor ac consequat. Aliquam fermentum a nisl a condimentum. Donec id volutpat neque. Nam congue, arcu et vehicula condimentum, purus turpis suscipit massa, sed porttitor purus libero nec metus.</p>
+
 
           </div>
           <div className="footer">

@@ -31,6 +31,28 @@ class AllRooms extends React.Component
 
     render()
     {
+        //------------------------------------------------------CAMERE FILTRATE-------------------------------------------------------
+        if(this.props.filteredRooms)
+        return(
+            <div className="container">
+                <h2 style={{textAlign:"center"}}>Our Rooms</h2>
+                <br/>
+                <div className=" layoutRooms " style={{textAlign:"center"}}>
+                {this.props.filteredRooms.map(room => <Room room={room} key={room.id} adminView={this.props.adminView} notifyShowRoomForm = {this.notifyShowRoomForm} notifyDeleteRoom = {this.notifyDeleteRoom} notifyShowRoomDetails={this.notifyShowRoomDetails}/>)}   
+                </div>
+                <br/><br/>
+                {
+                    this.props.adminView?
+                    <div style={{textAlign:"center"}}>
+                    <button className="btn btn-primary" onClick={()=>this.notifyShowRoomForm()}>Add Room <i class="bi bi-plus-circle"></i></button>
+                    </div>
+                    :
+                    ""
+                }                 
+            </div>
+        )
+
+        //-------------------------------------------------TUTTE LE CAMERE--------------------------------------------------------------
         return(
                 <div className="container">
                     <h2 style={{textAlign:"center"}}>Our Rooms</h2>
