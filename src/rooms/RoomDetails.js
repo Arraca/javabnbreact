@@ -48,8 +48,9 @@ class RoomDetails extends React.Component
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><i class="bi bi-wifi"></i> Free Wi-Fi</li>
-                    <li class="list-group-item"><i class="bi bi-car-front"></i> Free parking on the property</li>
+                    <li class="list-group-item"><i class="bi bi-p-square-fill"></i> Free parking on the property</li>
                     <li class="list-group-item"><i class="bi bi-egg-fried"></i> Breakfast included</li>
+                    <li class="list-group-item"><i class="bi bi-person-wheelchair"></i>Accessibility</li>
                 </ul>
                 </div>  
                 <br/>

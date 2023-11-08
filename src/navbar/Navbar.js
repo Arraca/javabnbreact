@@ -58,13 +58,13 @@ class Navbar extends React.Component
                             {
                             (this.props.loginDone && !this.props.adminView)?
                             <li class="nav-item">
-                            <button class="nav-link" onClick={this.notifyShowBookings}>I tuoi soggiorni</button> 
+                            <button class="nav-link" onClick={this.notifyShowBookings}>Your visits</button> 
                             </li> 
                             :
                         
                             (this.props.loginDone && this.props.adminView)?
                             <li class="nav-item">
-                            <button class="nav-link" onClick={this.notifyEmployeeBookings}>Lista di prenotazioni</button> 
+                            <button class="nav-link" onClick={this.notifyEmployeeBookings}>Reservation list</button> 
                             </li> 
                             :
                             ""    

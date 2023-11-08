@@ -40,7 +40,7 @@ class FormRoom extends React.Component
 //-------------------------------------------NEW ROOM--------------------------------------------------
         if(!this.props.updatingRoom)
         return(
-            <div className="formRoom">
+            <div className="formRoom container">
                 <div>
                     <button className="btn btn-light"><i class="bi bi-arrow-left-circle" style={{fontSize:30}} onClick={this.notifyShowRooms}></i></button>
                 </div>
@@ -75,7 +75,7 @@ class FormRoom extends React.Component
 //-----------------------------------------UPDATE-----------------------------------------------------
         else{
             return(
-                <div className="formRoom">
+                <div className="formRoom container">
                     <div>
                         <button className="btn btn-light"><i class="bi bi-arrow-left-circle" style={{fontSize:30}} onClick={this.notifyShowRooms}></i></button>
                     </div>
@@ -96,7 +96,7 @@ class FormRoom extends React.Component
                         </div>
                         <div class="mb-3">
                             <label for="img_url" class="form-label">Image</label>
-                            <input value={this.props.roomToUpdate.img_url} name="img_url" type="text" class="form-control" id="img_url" onChange={this.handleChange} required/>
+                            <input placeholder={this.props.roomToUpdate.img_url} name="img_url" type="text" class="form-control" id="img_url" onChange={this.handleChange} required/>
                         </div>
                         <div class="mb-3">
                             <label for="notes" class="form-label">Notes</label>

@@ -28,7 +28,7 @@ class Booking extends React.Component
     render()
     {
         return(
-                <tr>
+                <tr style={{fontSize:20}}>
                     <td>
                     {this.props.booking.room.name}
                     </td>
@@ -47,6 +47,14 @@ class Booking extends React.Component
                         <td>
                         {this.props.booking.room.notes}
                         </td>
+                    }
+                    {
+                        this.props.showEmployeeBookings ?
+                        <td>
+                            {this.props.booking.customer.username}
+                        </td>
+                        :
+                        ""
                     }
                     <td>
                     &euro; {this.props.booking.totalPrice}

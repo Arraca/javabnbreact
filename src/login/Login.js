@@ -6,7 +6,11 @@ class Login extends React.Component
     constructor(props)
     {
         super(props);
-       this.state = {showRegister : false, tempCredentialsLogin : {}, tempCredentialsRegister : {}, showLoginError:false, emailError:false, showRegisterError:false}
+        let todayTimestamp = Date.now();
+        // Converti il timestamp in una data nel formato "YYYY-MM-DD"
+        let today = new Date(todayTimestamp).toISOString().split('T')[0];
+
+       this.state = {showRegister : false, maxDate : today, tempCredentialsLogin : {}, tempCredentialsRegister : {}, showLoginError:false, emailError:false, showRegisterError:false}
        
     }
     
@@ -142,7 +146,7 @@ class Login extends React.Component
                     {
                     this.state.showLoginError? 
                     <div class="alert alert-danger" role="alert">
-                    Errore nel login: Account non ancora registrato o password errata.
+                    Error in logging in: Account not yet registered or wrong password.
                     </div>
                     :
                     ""
@@ -177,13 +181,13 @@ class Login extends React.Component
                     </div>
                     <div class="mb-3">
                         <label for="dobInput" class="form-label">Date of birth</label>
-                        <input name="dob" type="date" class="form-control" id="dobInput" required onChange={this.handleChangeRegister}/>
+                        <input name="dob" type="date" max={this.state.maxDate} class="form-control" id="dobInput" required onChange={this.handleChangeRegister}/>
                     </div>
                     <br/>
                     {
                         this.state.emailError?
                         <div class="alert alert-danger" role="alert">
-                        Errore: Email non è nel formato corretto (example@domain.ccc)!
+                        Error: Email is not in the correct format (example@domain.ccc)!
                         </div>
                         :
                        ""        
@@ -192,7 +196,7 @@ class Login extends React.Component
                     {
                     this.state.showRegisterError? 
                     <div class="alert alert-danger" role="alert">
-                    Errore durante la registrazione: email già registrata!
+                    Error during registration: email already registered!
                     </div>
                     :
                     ""

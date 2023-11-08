@@ -37,9 +37,16 @@ class AllRooms extends React.Component
             <div className="container">
                 <h2 style={{textAlign:"center"}}>Our Rooms</h2>
                 <br/>
-                <div className=" layoutRooms " style={{textAlign:"center"}}>
-                {this.props.filteredRooms.map(room => <Room room={room} key={room.id} adminView={this.props.adminView} notifyShowRoomForm = {this.notifyShowRoomForm} notifyDeleteRoom = {this.notifyDeleteRoom} notifyShowRoomDetails={this.notifyShowRoomDetails}/>)}   
-                </div>
+                {
+                    this.props.filteredRooms.length>0?
+                    <div className=" layoutRooms " style={{textAlign:"center"}}>
+                    {this.props.filteredRooms.map(room => <Room room={room} key={room.id} adminView={this.props.adminView} notifyShowRoomForm = {this.notifyShowRoomForm} notifyDeleteRoom = {this.notifyDeleteRoom} notifyShowRoomDetails={this.notifyShowRoomDetails}/>)}   
+                    </div>
+                    :
+                    <div class="alert alert-danger" role="alert">
+                        Sorry, no room matches your search.
+                    </div> 
+                }
                 <br/><br/>
                 {
                     this.props.adminView?

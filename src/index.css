@@ -18,7 +18,6 @@ code {
   /* width: 1366px;
   height: 768px; */
   background-color: #eeeeee;
-
   display: grid;
   grid:
     "header" auto
@@ -30,10 +29,11 @@ code {
 
 .header { grid-area: header; }
 .main { 
+  min-height: 1050px;
   grid-area: main; 
-  display: flex;
-  justify-content: center; /* Per l'allineamento orizzontale al centro */
-  align-items: center;
+  /* display: flex; */
+  justify-content: center; /* Per l'allineamento orizzontale al centro*/
+  align-items: center; 
 }
 .footer { grid-area: footer; }
 /*----------------------ELENCO PRODOTTI----------------------*/
@@ -80,4 +80,13 @@ code {
 .formRoom 
 {
   width: 60%;
+}
+
+/*-------------------------------ICONS---------------------------*/
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
 }

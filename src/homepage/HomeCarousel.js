@@ -14,7 +14,7 @@ function HomeCarousel(props)
   };
 
   return (
-    <Carousel activeIndex={index} onSelect={handleSelect}>
+    <Carousel activeIndex={index} onSelect={handleSelect} data-bs-theme="dark">
        {data.map((img_url) => {
         return (
           <Carousel.Item interval={5000} pause={"hover"}>        

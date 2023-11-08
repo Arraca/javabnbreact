@@ -19,7 +19,7 @@ class Footer extends React.Component
                             <b><i class="bi bi-telephone-fill" style={{fontSize:25}}></i> (+39) 011 00 00 000</b><br/>
                             <b><i class="bi bi-whatsapp" style={{fontSize:25}}></i> (+39) 333 33 33 333</b><br/>
                             <b><i class="bi bi-envelope-at-fill" style={{fontSize:25}}></i> javabnb@example.com</b><br/>
-                            <b><i class="bi bi-geo-alt-fill" style={{fontSize:25}}></i> Corso Regina Margherita 159/B</b>
+                            <b><i class="bi bi-geo-alt-fill" style={{fontSize:25}}></i> Strada del Lionetto 151/G</b>
                         
                     </div>
                 </div>
@@ -35,7 +35,7 @@ class Footer extends React.Component
                     </div>
                 </div>
                 <div className="text-center p-4">
-                            © 2021 Copyright: GELFsrl.com
+                            © 2021 Copyrightzz: GELFsrl.com
                 </div>
 
             </div>
